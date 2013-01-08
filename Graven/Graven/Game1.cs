@@ -433,7 +433,7 @@ namespace Graven
 
             if (mouse_x > 0 && mouse_x < totalWidth && mouse_y > 0 && mouse_y < totalHeight)
             {
-                if (tiles[mouse_y / 16, mouse_x / 16].tileType != tileIn)
+                if (tiles[mouse_y / 16, mouse_x / 16].tileType == TileType.Empty)
                 {
                     tiles[mouse_y / 16, mouse_x / 16].tileType = tileIn;
                     tiles[mouse_y / 16, mouse_x / 16].decorationValue = decoration;
