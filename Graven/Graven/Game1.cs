@@ -31,6 +31,7 @@ namespace Graven
         Tile[,] tiles;
         Random rand = new Random();
         Player player;
+        int prevMouseScroll, mouseScroll;
 
         bool pauseWater = false;
         bool DEBUG = true;
@@ -142,6 +143,7 @@ namespace Graven
                 }
             }
 
+           
             calculateTiles();
         }
 
@@ -234,6 +236,9 @@ namespace Graven
             #region Keyboard Checking
 
             KeyboardState keyS = Keyboard.GetState();
+            MouseState mState = Mouse.GetState();
+
+             int mouseScroll = (int)Mouse.GetState().ScrollWheelValue / 120;
             
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyS.IsKeyDown(Keys.Escape))
                 this.Exit();
@@ -303,6 +308,15 @@ namespace Graven
                     player.activeInventorySlot = 4;
                     waterCheck = totalElapsed;
                    // setTile(TileType.Decoration, 1);
+                }
+                else if (prevMouseScroll != mouseScroll)
+                {
+                    player.activeInventorySlot += (prevMouseScroll - mouseScroll);
+
+                    if (player.activeInventorySlot > 4)
+                        player.activeInventorySlot = 4;
+                    else if (player.activeInventorySlot < 0)
+                        player.activeInventorySlot = 0;
                 }
 
                 if (Mouse.GetState().LeftButton == ButtonState.Pressed)
@@ -397,7 +411,8 @@ namespace Graven
             #endregion
 
             player.Update(ref tiles, keyS, gameTime, cameraPosition);
-        
+
+            prevMouseScroll = mouseScroll;
             base.Update(gameTime);
         }
 
@@ -544,6 +559,7 @@ namespace Graven
             spriteBatch.DrawString(font, "Player CAM : " + player.cameraPosition.ToString(), new Vector2(10, 100), textRed);
             spriteBatch.DrawString(font, "Block Count : " + player.blockCount.ToString(), new Vector2(10, 115), textRed);
             spriteBatch.DrawString(font, "Delta : " + delta.ToString(), new Vector2(10, 130), textRed);
+            spriteBatch.DrawString(font, "Scroll : " + mouseScroll.ToString(), new Vector2(10, 145), textRed);
 
         }
         public void countDrops()
