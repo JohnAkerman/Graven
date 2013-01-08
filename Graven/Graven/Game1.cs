@@ -160,7 +160,7 @@ namespace Graven
 
             if (mouse_x > 0 && mouse_x < totalWidth && mouse_y > 0 && mouse_y < totalHeight)
             {
-                if (checkBreakable(tiles[mouse_y / 16, mouse_x / 16].tileType))
+                if (player.inventoryTypes[player.activeInventorySlot] == Player.InventoryType.Spade && checkBreakable(tiles[mouse_y / 16, mouse_x / 16].tileType))
                     spriteBatch.Draw(spadeIcon, new Vector2(mouse_x, mouse_y-8), Color.White);
                 else
                     spriteBatch.Draw(mouseTex, new Vector2(mouse_x, mouse_y), Color.White);
