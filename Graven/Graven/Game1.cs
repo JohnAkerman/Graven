@@ -337,7 +337,7 @@ namespace Graven
                         case Player.InventoryType.MetalTile:
                             if (player.inventoryCount[player.activeInventorySlot] > 0)
                             {
-                                if (setTile(TileType.Dirt))
+                                if (setTile(TileType.Metal))
                                     player.inventoryCount[player.activeInventorySlot]--;
                             }
                             break;
@@ -411,6 +411,7 @@ namespace Graven
             #endregion
 
             player.Update(ref tiles, keyS, gameTime, cameraPosition);
+            player.updateInventory();
 
             prevMouseScroll = mouseScroll;
             base.Update(gameTime);

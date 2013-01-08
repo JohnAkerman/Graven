@@ -76,7 +76,17 @@ namespace Graven
             }
         }
 
-     
+        public void updateInventory()
+        {
+            for (int i = 0; i < inventoryCount.Length; i++)
+            {
+                if (inventoryCount[i] == 0 && (inventoryTypes[i] == InventoryType.WaterBlock || inventoryTypes[i] == InventoryType.MetalTile || inventoryTypes[i] == InventoryType.DirtTile))
+                {
+                    inventoryTypes[i] = InventoryType.Empty;
+                }
+            }
+        }
+
         public void selectSlot(int toSelect)
         {
             activeInventorySlot = toSelect;
