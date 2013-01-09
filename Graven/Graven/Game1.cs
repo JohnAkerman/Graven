@@ -21,7 +21,7 @@ namespace Graven
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle screenRectangle;
-        Texture2D tileGrassTop, tileDirt, levelOne, backgroundTex, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, spadeIcon,treeTex, tileMetal, inventoryTex;
+        Texture2D tileGrassTop, tileDirt, levelOne, backgroundTex, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, spadeIcon,treeTex, tileMetal, inventoryTex, cloudTex, bgPara, hillsTex;
         const int screenHeight = 600;
         const int screenWidth = 1000;
         int levelHeight = 38;
@@ -61,7 +61,7 @@ namespace Graven
 
             screenRectangle = new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
             cameraPosition = new Vector2(0, 0);
-        }
+           }
 
         protected override void Initialize()
         {
@@ -203,6 +203,10 @@ namespace Graven
             spadeIcon = Content.Load<Texture2D>("spadeIcon");
             treeTex = Content.Load<Texture2D>("tree");
             inventoryTex = Content.Load<Texture2D>("inventory");
+            cloudTex = Content.Load<Texture2D>("cloud1");
+            bgPara = Content.Load<Texture2D>("bg-parallax");
+            hillsTex = Content.Load<Texture2D>("hillsTex");
+
             levelHeight = levelOne.Height;
             levelWidth = levelOne.Width;
             totalWidth = levelWidth * 16;
@@ -372,7 +376,7 @@ namespace Graven
                 if (keyS.IsKeyDown(Keys.D))
                 {
                     if (player.position.X - cameraPosition.X >= 800)
-                        cameraPosition.X += 2;
+                      cameraPosition.X += 2;
                 }
 
                 if (keyS.IsKeyDown(Keys.A))
@@ -380,7 +384,7 @@ namespace Graven
                     if (player.position.X - cameraPosition.X >= 100)
                     {
                         if (cameraPosition.X > 0)
-                            cameraPosition.X-=2;
+                           cameraPosition.X-=2;
                     }
                 }
             }
@@ -531,10 +535,23 @@ namespace Graven
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+        /*    spriteBatch.Begin();
             spriteBatch.Draw(backgroundTex, Vector2.Zero, new Rectangle((int)cameraPosition.X, 0, screenWidth, screenHeight), Color.White);
+            spriteBatch.End();*/
+
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearWrap, null, null);
+            spriteBatch.Draw(bgPara, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.1f), Convert.ToInt32(cameraPosition.Y * 0.1f), cloudTex.Width, cloudTex.Height), Color.White);
+            spriteBatch.Draw(hillsTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.3f), Convert.ToInt32(cameraPosition.Y * 0.3f), cloudTex.Width, cloudTex.Height), Color.White);
+
+            spriteBatch.Draw(cloudTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X  * 0.5f), Convert.ToInt32(cameraPosition.Y * 0.5f), cloudTex.Width, cloudTex.Height), Color.White);
+            spriteBatch.Draw(cloudTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.8f), Convert.ToInt32(cameraPosition.Y * 0.8f), cloudTex.Width, cloudTex.Height), Color.White);
+            //spriteBatch.Draw(texture2, position, new Rectangle(cameraX * 0.8f, cameraY * 0.8f, texture2.Width, texture2.Height), Color.White);
+           // spriteBatch.Draw(texture3, position, new Rectangle(cameraX * 1.0f, cameraY * 1.0f, texture3.Width, texture3.Height), Color.White);
+            spriteBatch.End();
+
+            spriteBatch.Begin();
             drawTiles();
-            
             player.Draw(spriteBatch);
             drawDroplets();
             UpdateMouse();
