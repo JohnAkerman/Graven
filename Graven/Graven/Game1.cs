@@ -21,7 +21,7 @@ namespace Graven
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle screenRectangle;
-        Texture2D tileGrassTop, tileDirt, levelOne, backgroundTex, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, spadeIcon,treeTex, tileMetal, inventoryTex, cloudTex, bgPara, hillsTex;
+        Texture2D tileGrassTop, tileDirt, levelOne, backgroundTex, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, spadeIcon,treeTex, tileMetal, inventoryTex;
         const int screenHeight = 600;
         const int screenWidth = 1000;
         int levelHeight = 38;
@@ -29,6 +29,7 @@ namespace Graven
         int totalWidth = 0, totalHeight = 0;
         float elapsed, totalElapsed = 1.25f, pressCheckDelay = 1.25f, waterCheck = 0;
         Tile[,] tiles;
+        Layer[] layers;
         Random rand = new Random();
         Player player;
         int prevMouseScroll, mouseScroll;
@@ -61,10 +62,13 @@ namespace Graven
 
             screenRectangle = new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
             cameraPosition = new Vector2(0, 0);
+            layers = new Layer[2];
+            
            }
 
         protected override void Initialize()
         {
+       
             base.Initialize();
         }
 
@@ -203,9 +207,7 @@ namespace Graven
             spadeIcon = Content.Load<Texture2D>("spadeIcon");
             treeTex = Content.Load<Texture2D>("tree");
             inventoryTex = Content.Load<Texture2D>("inventory");
-            cloudTex = Content.Load<Texture2D>("cloud1");
-            bgPara = Content.Load<Texture2D>("bg-parallax");
-            hillsTex = Content.Load<Texture2D>("hillsTex");
+        
 
             levelHeight = levelOne.Height;
             levelWidth = levelOne.Width;
@@ -213,6 +215,10 @@ namespace Graven
             totalHeight = levelHeight * 16;
             player = new Player(screenRectangle, totalHeight, totalWidth);
             player.texture = Content.Load<Texture2D>("player");
+
+            layers[0] = new Layer(Content, "backgrounds/clouds", 0.1f);
+            layers[1] = new Layer(Content, "backgrounds/hills", 0.3f);
+
             setUpTile("levelOne.png");
             setupDrops();
         }
@@ -534,24 +540,24 @@ namespace Graven
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            //spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearWrap, null, null);
+            spriteBatch.Begin();
 
-        /*    spriteBatch.Begin();
-            spriteBatch.Draw(backgroundTex, Vector2.Zero, new Rectangle((int)cameraPosition.X, 0, screenWidth, screenHeight), Color.White);
-            spriteBatch.End();*/
+            for (int i = 0; i < layers.Length; i++)
+            {
+                layers[i].Draw(spriteBatch, cameraPosition);
+            }
 
+            //spriteBatch.Draw(bgPara, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.1f), Convert.ToInt32(cameraPosition.Y * 0.1f), cloudTex.Width, cloudTex.Height), Color.White);
+            //spriteBatch.Draw(hillsTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.3f), Convert.ToInt32(cameraPosition.Y * 0.3f), cloudTex.Width, cloudTex.Height), Color.White);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearWrap, null, null);
-            spriteBatch.Draw(bgPara, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.1f), Convert.ToInt32(cameraPosition.Y * 0.1f), cloudTex.Width, cloudTex.Height), Color.White);
-            spriteBatch.Draw(hillsTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.3f), Convert.ToInt32(cameraPosition.Y * 0.3f), cloudTex.Width, cloudTex.Height), Color.White);
-
-            spriteBatch.Draw(cloudTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X  * 0.5f), Convert.ToInt32(cameraPosition.Y * 0.5f), cloudTex.Width, cloudTex.Height), Color.White);
-            spriteBatch.Draw(cloudTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.8f), Convert.ToInt32(cameraPosition.Y * 0.8f), cloudTex.Width, cloudTex.Height), Color.White);
+            //spriteBatch.Draw(cloudTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X  * 0.5f), Convert.ToInt32(cameraPosition.Y * 0.5f), cloudTex.Width, cloudTex.Height), Color.White);
+            //spriteBatch.Draw(cloudTex, Vector2.Zero, new Rectangle(Convert.ToInt32(cameraPosition.X * 0.8f), Convert.ToInt32(cameraPosition.Y * 0.8f), cloudTex.Width, cloudTex.Height), Color.White);
             //spriteBatch.Draw(texture2, position, new Rectangle(cameraX * 0.8f, cameraY * 0.8f, texture2.Width, texture2.Height), Color.White);
            // spriteBatch.Draw(texture3, position, new Rectangle(cameraX * 1.0f, cameraY * 1.0f, texture3.Width, texture3.Height), Color.White);
-            spriteBatch.End();
-
-            spriteBatch.Begin();
+            
             drawTiles();
+          
             player.Draw(spriteBatch);
             drawDroplets();
             UpdateMouse();
@@ -635,16 +641,21 @@ namespace Graven
 
         public void drawTiles()
         {
+            float topLayer = 0.00f;
             for (int y = getCameraPosY(0); y < getCameraPosY(screenHeight + 16); y++)
             {
                 for (int x = getCameraPosX(- 16); x < getCameraPosX(screenWidth + 16); x++)
                 {
+                    if (topLayer < 1.0f && y > 10)
+                        topLayer -= 0.01f;
+
                     if (x < 0 || y < 0 || x >= levelWidth || y >= levelHeight) continue;
                     if (tiles[y,x] != null && tiles[y, x].render)
                     {
                         switch (tiles[y, x].tileType)
                         {
                             case TileType.Dirt:
+                             
                                 spriteBatch.Draw(tileDirt, tiles[y, x].position - cameraPosition, new Rectangle(16 * (int)tiles[y, x].tileOrientation, 16 * (int)tiles[y,x].damage, 16, 16), Color.White);
                                 break;
                             case TileType.Decoration:

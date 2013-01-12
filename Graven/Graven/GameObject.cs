@@ -22,7 +22,8 @@ namespace Graven
         public Vector2 position, velocity, accel, size, cameraPosition;
         public Rectangle boundingBox;
         public bool active, render;
-        public int frameCount = 1, tileX, tileY;
+        public int frameCount = 1, tileX, tileY, frameSize, timeSinceLastFrame, millisecondsPerFrame;
+        public Vector2 currentFrame, sheetSize;
         public int totalHeight, totalWidth; // Total Height/Width of the map.
 
         public TileType nextPos;
@@ -32,6 +33,19 @@ namespace Graven
         {
         }
 
+        public void updateFrame(GameTime gt)
+        {
+            timeSinceLastFrame += gt.ElapsedGameTime.Milliseconds;
+            if (timeSinceLastFrame > millisecondsPerFrame)
+            {
+                timeSinceLastFrame = 0;
+                currentFrame.X++;
+                if (currentFrame.X >= sheetSize.X)
+                {
+                    currentFrame.X = 0;
+                }
+            }
+        }
         public Rectangle getBounds()
         {
             return new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)size.Y);

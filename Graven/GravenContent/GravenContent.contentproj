@@ -159,20 +159,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="cloud1.png">
-      <Name>cloud1</Name>
+    <Compile Include="backgrounds\hills.png">
+      <Name>hills</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bg-parallax.png">
-      <Name>bg-parallax</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="hillsTex.png">
-      <Name>hillsTex</Name>
+    <Compile Include="backgrounds\clouds.png">
+      <Name>clouds</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
