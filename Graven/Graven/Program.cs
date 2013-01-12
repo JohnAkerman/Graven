@@ -10,7 +10,7 @@ namespace Graven
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (Game game = new Game())
             {
                 game.Run();
             }

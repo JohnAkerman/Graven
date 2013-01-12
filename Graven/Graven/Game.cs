@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Media;
 namespace Graven
 {
    
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Game : Microsoft.Xna.Framework.Game
     {
         
         #region Initialisations.
@@ -22,8 +22,8 @@ namespace Graven
         SpriteBatch spriteBatch;
         Rectangle screenRectangle;
         Texture2D tileGrassTop, tileDirt, levelOne, backgroundTex, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, spadeIcon,treeTex, tileMetal, inventoryTex;
-        const int screenHeight = 600;
-        const int screenWidth = 1000;
+        const int screenHeight = 800;
+        const int screenWidth = 1200;
         int levelHeight = 38;
         int levelWidth = 50;
         int totalWidth = 0, totalHeight = 0;
@@ -49,7 +49,7 @@ namespace Graven
 
         #endregion
 
-        public Game1()
+        public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = screenHeight;
@@ -68,7 +68,6 @@ namespace Graven
 
         protected override void Initialize()
         {
-       
             base.Initialize();
         }
 
