@@ -131,12 +131,12 @@ namespace Graven
         {
         }
 
-        
-        public void Update(ref Tile[,] tiles, KeyboardState keyboard, GameTime gt, Vector2 camPos)
+        private Vector2 prevPos;
+        public void Update(ref Tile[,,] tiles, KeyboardState keyboard, GameTime gt, Vector2 camPos)
         {
             cameraPosition = camPos;
-            Vector2 prevPos = position;
-            float timeGone = (float)gt.ElapsedGameTime.TotalSeconds;
+            prevPos = position;
+            timeGone = (float)gt.ElapsedGameTime.TotalSeconds;
 
             tileX = getTileCoords("X");
             tileY = getTileCoords("Y");
@@ -150,7 +150,7 @@ namespace Graven
            
             if (keyboard.IsKeyDown(Keys.Right) || keyboard.IsKeyDown(Keys.D)) // Move Right
             {
-                if ( position.X < totalWidth)
+                if ( position.X < totalWidth * 16)
                     movement = 1.0f;
                 facingLeft = false;
 
@@ -177,138 +177,6 @@ namespace Graven
             position = new Vector2((float)Math.Round(position.X), (float)Math.Round(position.Y));
 
             HandleCollisions(ref tiles);
-
-            #region oldcollision
-            /*
-
-            tileX = getTileCoords("X", 16);
-            tileY = getTileCoords("Y", 16);
-
-            int tileHitX, tileHitY;
-
-
-            if (!checkCollidable(tiles[grabY(tileY, getTileCoords(, 16)), grabX(tileX, getTileCoords((int)position.X - (int)velocity.X, 16))].tileType))
-            {
-                if (!checkBounding(tiles[grabY(tileY, getTileCoords((int)position.Y - (int)velocity.Y, 16)), grabX(tileX, getTileCoords((int)position.X - (int)velocity.X, 16))]))
-                {
-                    position.X -= velocity.X * timeGone;
-                    position.Y -= velocity.Y * timeGone;
-                }
-                else
-                {
-                    Vector2 depth = GetIntersectionDepth(getBounds(), tiles[grabY(tileY, getTileCoords((int)position.Y - (int)velocity.Y, 16)), grabX(tileX, getTileCoords((int)position.X - (int)velocity.X, 16))].getBounds());
-
-                    if (depth != Vector2.Zero)
-                    {
-                        tileHitX = (int)position.X - (int)velocity.X;
-                        tileHitY = (int)position.Y - (int)velocity.Y;
-
-                        float absDepthX = Math.Abs(depth.X);
-                        float absDepthY = Math.Abs(depth.Y);
-
-                        if (absDepthY < absDepthX)
-                        {
-                            position = new Vector2(position.Y - depth.Y, position.X);
-                            velocity = Vector2.Zero;
-                        }
-                        // else
-                        //   position = new Vector2( position.Y, position.X - depth.X);
-
-                        vertState = Player.verticalState.Ground;
-                    }
-                    else
-                    {
-                       // vertState = Player.verticalState.Falling;
-                    }
-                }
-            }
-            else
-            {
-                // Colliison
-               /*
-                position.X += velocity.X * timeGone;
-                position.Y += velocity.Y * timeGone;
-               
-
-                Vector2 depth = GetIntersectionDepth(getBounds(), tiles[grabY(tileY, getTileCoords((int)position.Y - (int)velocity.Y, 16)), grabX(tileX, getTileCoords((int)position.X - (int)velocity.X, 16))].getBounds());
-
-                if (depth != Vector2.Zero)
-                {
-                    tileHitX = (int)position.X - (int)velocity.X;
-                    tileHitY = (int)position.Y - (int)velocity.Y;
-
-                    float absDepthX = Math.Abs(depth.X);
-                    float absDepthY = Math.Abs(depth.Y);
-
-                    if (absDepthY < absDepthX)
-                    {
-                        position = new Vector2(position.Y - depth.Y, position.X);
-                        velocity = Vector2.Zero;
-                    }
-                    // else
-                    //   position = new Vector2( position.Y, position.X - depth.X);
-
-                    vertState = Player.verticalState.Ground;
-                }
-                else
-                {
-                   // vertState = Player.verticalState.Falling;
-                }
-
-                velocity = Vector2.Zero;
-            }
-
-            
-
-
-            if (!checkCollidable(tiles[grabY(tileY, getTileCoords((int)position.Y - (int)velocity.Y, 16)), grabX(tileX, getTileCoords((int)position.X - (int)velocity.X, 16))].tileType))
-            {
-                if (checkBounding(tiles[grabY(tileY, getTileCoords((int)position.Y - (int)velocity.Y, 16)), grabX(tileX, getTileCoords((int)position.X - (int)velocity.X, 16))]))
-                    vertState = verticalState.Ground;
-                else
-                    vertState = verticalState.Falling;
-            }
-           else {  vertState = verticalState.Falling;} 
-
-                  //  //
-                  //  int tileHitX, tileHitY;
-
-                  /* for (int y = tileY - 3; y < tileY + 3; y++)
-                   {
-                       for (int x = tileX - 3; x < tileX + 3; x++)
-                       {
-                           if (x < 0 || x > 100 || y < 0 || y > 37) continue;
-
-                           if (tiles[y, x].tileType == TileType.Dirt || tiles[y, x].tileType == TileType.Sand)
-                           {
-                               Vector2 depth = GetIntersectionDepth(getBounds(), tiles[y, x].getBounds());
-
-                               if (depth != Vector2.Zero)
-                               {
-                                   tileHitX = x * 16;
-                                   tileHitY = y * 16;
-                                   float absDepthX = Math.Abs(depth.X);
-                                   float absDepthY = Math.Abs(depth.Y);
-
-                                   if (absDepthY < absDepthX)
-                                   {
-                                       position = new Vector2(position.Y - depth.Y, position.X);
-                                       velocity = Vector2.Zero;
-                                   }
-                                  // else
-                                    //   position = new Vector2( position.Y, position.X - depth.X);
-
-                                   vertState = Player.verticalState.Ground;
-                               }
-                               else
-                               {
-                                   //vertState = Player.verticalState.Falling;
-                               }
-                           }
-                       }
-                   }
-                   */
-            #endregion
 
             if (position.X == prevPos.X)
                 velocity.X = 0;
@@ -351,7 +219,12 @@ namespace Graven
             return velocityY;
         }
 
-        private void HandleCollisions(ref Tile[,] tiles)
+        public void setPosition(int x, int y)
+        {
+            position = new Vector2(x, y);
+        }
+
+        private void HandleCollisions(ref Tile[,,] tiles)
         {
             // Get the player's bounding rectangle and find neighboring tiles.
             Rectangle bounds = getBounds();
@@ -366,14 +239,15 @@ namespace Graven
             {
                 for (int x = leftTile; x <= rightTile; ++x)
                 {
-                    if (x < 0 || x > totalWidth || y < 0 || y > totalHeight) continue;
+                    if (x < 0 || x > totalWidth || y < 0 || y > totalHeight) 
+                        continue;
                     // If this tile is collidable,
-                    TileCollision collision = tiles[y, x].tileCollision;
+                    TileCollision collision = tiles[1, y, x].tileCollision;
 
                     if (collision != TileCollision.Passable)
                     {
                         // Determine collision depth (with direction) and magnitude.
-                        Rectangle tileBounds = tiles[y, x].getBounds();
+                        Rectangle tileBounds = tiles[1,y, x].getBounds();
 
                         Vector2 depth = GetIntersectionDepth(bounds, tileBounds);
                         if (depth != Vector2.Zero)

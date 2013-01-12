@@ -158,7 +158,7 @@ namespace Graven
 
            
         }
-        public void calculateOrientation(ref Tile[,]tiles)
+        public void calculateOrientation(ref Tile[,,]tiles)
         {
             tileX = getTileCoords("X");
             tileY = getTileCoords("Y");
@@ -176,22 +176,22 @@ namespace Graven
             if (tileX == 0)
                 tileOrientation = TileOrientation.Single;
 
-            if (tiles[grabY(-1), tileX].tileType != tileType)
+            if (tiles[1, grabY(-1), tileX].tileType != tileType)
                 topMost = true;
             else
                 topMost = false;
 
-            if (tiles[grabY(1), tileX].tileType != tileType)
+            if (tiles[1, grabY(1), tileX].tileType != tileType)
                 bottomMost = true;
             else
                 bottomMost = false;
 
-            if (tiles[tileY, grabX(1)].tileType != tileType)
+            if (tiles[1, tileY, grabX(1)].tileType != tileType)
                 rightMost = true;
             else
                 rightMost = false;
 
-            if (tileX > 0 && tiles[tileY, grabX(-1)].tileType != tileType)
+            if (tileX > 0 && tiles[1, tileY, grabX(-1)].tileType != tileType)
                 leftMost = true;
             else
                 leftMost = false;
@@ -261,7 +261,7 @@ namespace Graven
                 return (tileY + newY);
         }
 
-        public void updateTile(ref Tile[,] tiles, float elapsedTime, Vector2 camPos)
+        public void updateTile(ref Tile[,,] tiles, float elapsedTime, Vector2 camPos)
         {
             //cameraPosition = camPos;
 
@@ -275,15 +275,15 @@ namespace Graven
 
             if (moveNext)
             {
-                tiles[tileY + 1, tileX].tileType = TileType.Sand;
-                tiles[tileY, tileX].tileType = TileType.Empty;
+                tiles[1, tileY + 1, tileX].tileType = TileType.Sand;
+                tiles[1, tileY, tileX].tileType = TileType.Empty;
                 calculateOrientation(ref tiles);
                 moveNext = false;
             }
 
             if (tileY <= 37)
             {
-                if (tiles[tileY + 1, tileX].tileType == TileType.Empty)
+                if (tiles[1, tileY + 1, tileX].tileType == TileType.Empty)
                 {
                     moveNext = true;
                 }
