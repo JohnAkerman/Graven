@@ -17,7 +17,7 @@ namespace Graven
         public bool topMost = false;
         public bool waterSand = false;
 
-        public WaterDrop(GraphicsDevice graphics, int xIn, int yIn, int widthIn, int heightIn, int volume = 0)
+        public WaterDrop(int xIn, int yIn, int widthIn, int heightIn, int volume = 0)
         {
             this.size = new Vector2(16, 16);
             this.position = new Vector2(xIn * size.X, yIn * size.Y);
@@ -62,24 +62,24 @@ namespace Graven
             }
         }
 
-        public void Update(ref Tile[,] tiles, ref WaterDrop [,] drops, float elapsedTime)
+        public void Update(ref Tile[,,] tiles, ref WaterDrop [,] drops, float elapsedTime)
         {
             if (this.volume <= 0.0f || (elapsedTime - lastUpdate) < updateTime) { return; }
 
             lastUpdate = elapsedTime;
 
-            if (tiles[tileY, tileX].tileType == TileType.Dirt)
+            if (tiles[1, tileY, tileX].tileType == TileType.Dirt)
             {
                 this.volume = 0.0f;
                 return;
             }
 
-            if (tiles[tileY, tileX].tileType == TileType.Sand)
+            if (tiles[1, tileY, tileX].tileType == TileType.Sand)
                 waterSand = true;
             else
                 waterSand = false;
 
-            if (belowClear() && tiles[tileY + 1, tileX].tileType == TileType.Dirt || tiles[tileY + 1, tileX].tileType == TileType.Decoration || this.volume >= 1 && drops[grabY(1), tileX].volume >= 16)
+            if (belowClear() && tiles[1, tileY + 1, tileX].tileType == TileType.Dirt || tiles[1, tileY + 1, tileX].tileType == TileType.Decoration || this.volume >= 1 && drops[grabY(1), tileX].volume >= 16)
              {
                  if (this.volume > drops[tileY, grabX(-1)].volume && this.volume > drops[tileY, grabX(1)].volume) // Going Left and Right
                  {
@@ -91,19 +91,19 @@ namespace Graven
                      bool tmp = false;
                      int dividerAmount = 1;
 
-                     if (tiles[tileY, grabX(-1)].tileType != TileType.Dirt) 
+                     if (tiles[1, tileY, grabX(-1)].tileType != TileType.Dirt) 
                          dividerAmount++;
 
-                     if (tiles[tileY, grabX(1)].tileType != TileType.Dirt)
+                     if (tiles[1, tileY, grabX(1)].tileType != TileType.Dirt)
                          dividerAmount++;
 
-                     if (tiles[tileY, grabX(-1)].tileType != TileType.Dirt)
+                     if (tiles[1, tileY, grabX(-1)].tileType != TileType.Dirt)
                      {
                          drops[tileY, grabX(-1)].volume = (float)Math.Round(totalVol / dividerAmount, 2);
                          tmp = true;
                      }
 
-                     if (tiles[tileY, grabX(1)].tileType != TileType.Dirt) {
+                     if (tiles[1, tileY, grabX(1)].tileType != TileType.Dirt) {
                          drops[tileY, grabX(1)].volume = (float)Math.Round(totalVol / dividerAmount, 2);
                          tmp = true;
                      }
@@ -116,7 +116,7 @@ namespace Graven
                      if (tileX == grabX(-1)) return;
                      if (this.volume < 0.01f) { this.volume = 0.0f; return; }
                  
-                     if (tiles[tileY, grabX(-1)].tileType == TileType.Dirt)
+                     if (tiles[1, tileY, grabX(-1)].tileType == TileType.Dirt)
                          return;
                      
                      float totalVol = drops[tileY, grabX(-1)].volume + this.volume;
@@ -130,7 +130,7 @@ namespace Graven
                      if (tileX == grabX(1)) return;
                      if (this.volume < 0.01f) { this.volume = 0.0f; return; }
 
-                     if (tiles[tileY, grabX(1)].tileType == TileType.Dirt)
+                     if (tiles[1, tileY, grabX(1)].tileType == TileType.Dirt)
                         return;
                      
                      float totalVol = drops[tileY, grabX(1)].volume + this.volume;
@@ -143,7 +143,7 @@ namespace Graven
 
             // Check left empty AND left down is empty (then fall)
 
-            if (belowClear() && tiles[tileY + 1, tileX].tileType != TileType.Dirt)
+            if (belowClear() && tiles[1, tileY + 1, tileX].tileType != TileType.Dirt)
             {
                 // this.position.Y += 16;
                 // this.tileY = (int)this.position.Y / 16;

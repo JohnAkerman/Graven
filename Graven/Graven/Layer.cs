@@ -12,16 +12,16 @@ namespace Graven
     class Layer
     {
         Texture2D texture;
-        float scrollRate;
+        Vector2 scrollRate;
 
-        public Layer(ContentManager content, string stringBase, float scrollRate) {
+        public Layer(ContentManager content, string stringBase, Vector2 scrollRate) {
             this.texture = content.Load<Texture2D>(stringBase);
             this.scrollRate = scrollRate;
         }
 
         public void Draw(SpriteBatch sb, Vector2 camPos)
         {
-            sb.Draw(this.texture, Vector2.Zero, new Rectangle(Convert.ToInt32(camPos.X * scrollRate), Convert.ToInt32(camPos.Y * scrollRate), texture.Width, texture.Height), Color.White);
+            sb.Draw(this.texture, new Vector2(0,-450), new Rectangle(Convert.ToInt32(camPos.X * scrollRate.X), Convert.ToInt32(camPos.Y * scrollRate.Y), texture.Width, texture.Height), Color.White);
         }
     }
 }

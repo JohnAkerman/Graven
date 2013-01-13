@@ -38,7 +38,6 @@ namespace Graven
             if (!show) return;
 
             string fps = string.Format("FPS: {0}", frameRate);
-            sb.DrawString(spriteFont, fps, new Vector2(11, 11), Color.Black);
             sb.DrawString(spriteFont, fps, new Vector2(10, 10), Color.White);
         }
     }

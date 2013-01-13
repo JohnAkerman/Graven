@@ -10,14 +10,11 @@ namespace Graven
 {
     class Camera : GameObject
     {
-        public Vector2 position;
-
         public Camera(Vector2 posIn)
         {
             position = posIn;
             size = new Vector2(16, 16);
         }
-
 
         public int getCameraX(int widthIn)
         {

@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="DropManager.cs" />
     <Compile Include="FrameRateCounter.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Layer.cs" />

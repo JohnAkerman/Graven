@@ -18,10 +18,10 @@ namespace Graven
             Item
         }
 
-        public ObjectType objectType;
+        //public ObjectType objectType;
         public Vector2 position, velocity, accel, size, cameraPosition;
         public Rectangle boundingBox;
-        public bool active, render;
+        public bool render;
         public int frameCount = 1, tileX, tileY, frameSize, timeSinceLastFrame, millisecondsPerFrame;
         public Vector2 currentFrame, sheetSize;
         public int totalHeight, totalWidth; // Total Height/Width of the map.

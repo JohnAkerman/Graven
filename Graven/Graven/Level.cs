@@ -14,8 +14,9 @@ namespace Graven
     class Level
     {
         public Tile[,,] tileLayers;
+        public DropManager dropManager;
         public int levelWidth, levelHeight; // Total pixels of the level.
-        int levelTileWidth, levelTileHeight;
+        public int levelTileWidth, levelTileHeight;
         int tileSize = 16;
         int activeLayer = 1;
         int numLayers = 1;
@@ -27,7 +28,7 @@ namespace Graven
         #region Textures
 
         Texture2D currentLevel;
-        Texture2D tileGrassTop, tileDirt, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, tileMetal, darkTex;
+        Texture2D tileGrassTop, tileDirt, sandTex,  tileMetal, darkTex;
         
         #endregion
 
@@ -40,10 +41,6 @@ namespace Graven
             tileDirt = Content.Load<Texture2D>("Tiles/tileDirt");
             tileMetal = Content.Load<Texture2D>("Tiles/tileMetal");
             sandTex = Content.Load<Texture2D>("Tiles/sand");
-            WaterDropTex = Content.Load<Texture2D>("waterdrop");
-            waterSand = Content.Load<Texture2D>("Tiles/watersand");
-            topMost = Content.Load<Texture2D>("Tiles/topmost");
-            waterSandTop = Content.Load<Texture2D>("Tiles/watersandtop");
             darkTex = Content.Load<Texture2D>("Tiles/dark");
 
         }
@@ -54,18 +51,6 @@ namespace Graven
             screenTilesWidth = this.screenWidth / tileSize;
             screenTilesHeight = this.screenHeight / tileSize;
         }
-
-      /*  public void resetTiles()
-        {
-            tileLayers = new Tile[2, currentLevel.Height, currentLevel.Width];
-            for (int y = 0; y < levelHeight; y++)
-            {
-                for (int x = 0; x < levelWidth; x++)
-                {
-                    tileLayers[1, y, x] = new Tile(TileType.Empty, x, y, levelHeight, levelHeight, rand, TileCollision.Passable);
-                }
-            }
-        }*/
 
         public void calculateTiles(Camera cam, Player player, bool initialLoad = false)
         {

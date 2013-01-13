@@ -18,6 +18,8 @@ namespace Graven
         Sand,
         Tree,
         Metal,
+        Light,
+
     }
 
     public enum TileCollision
@@ -269,7 +271,7 @@ namespace Graven
                 {
                     for (int x = 0; x < totalWidth; x++)
                     {
-                        if (x > totalWidth - 1 || x < 0 || y + 1 > totalHeight - 1 || y < 0)
+                        if (x >= totalWidth || x < 0 || y >= totalHeight || y < 0)
                             continue;
 
                         if (tiles[1, y, x].tileType == TileType.Empty || tiles[1, y, x].tileType == TileType.Decoration || tiles[1, y, x].tileType == TileType.Tree)
@@ -287,7 +289,7 @@ namespace Graven
                     for (int y = (int)(player.position.Y / size.Y) - 50; y < (int)(player.position.Y / size.Y) + 50; y++)
                     {
 
-                        if (x > totalWidth - 1 || x < 0 || y + 1 > totalHeight - 1 || y < 0)
+                        if (x >= totalWidth || x < 0 || y >= totalHeight || y < 0)
                             continue;
 
                         if (tiles[1, y, x].tileType == TileType.Empty || tiles[1, y, x].tileType == TileType.Decoration || tiles[1, y, x].tileType == TileType.Tree)
@@ -304,11 +306,11 @@ namespace Graven
             for (int x = (int)(player.position.X / size.X) - 50; x < (int)(player.position.X / size.X) + 50; x++)
                 for (int y = (int)(player.position.Y / size.Y) - 50; y < (int)(player.position.Y / size.Y) + 50; y++)
                 {
-                    if (x > totalWidth - 1 || x < 0 || y > totalHeight - 1 || y < 0)
+                    if (x >= totalWidth|| x < 0 || y >= totalHeight || y < 0)
                         continue;
                     //if (tiles[1, y, x].tileType == TileType.Torch)
                    //     continue;
-                    tiles[1, y, x].lightValue = 0;
+                    tiles[1, y, x].lightValue = 0.1f;
                 }
             player.lightValue = 0;
         }
@@ -323,7 +325,7 @@ namespace Graven
                 for (int y = tileY - radius; y < tileY + radius + 1; y++)
                 {
                     //Make sure we don't exceed the boundaries of the world array.
-                    if (x < totalWidth - 1 && x > 0 && y < totalHeight - 1 && y > 0)
+                    if (x < totalWidth - 1 && x > 0 && y <= totalHeight -1 && y > 0)
                     {
                         if (x == tileX && y == tileY || tiles[1,y,x].tileType == TileType.Decoration) // || tiles[1, y,x].tileType == TileType.Torch)
                             continue;
@@ -343,7 +345,7 @@ namespace Graven
                             if (tiles[1, y, x].lightValue < tmpLightLevel)
                                 tiles[1, y, x].lightValue = tmpLightLevel;
                             if (tiles[1, y, x].lightValue < 0.0)
-                                tiles[1, y, x].lightValue = 0;
+                                tiles[1, y, x].lightValue = 0.1f;
                         }
                     }
                 }

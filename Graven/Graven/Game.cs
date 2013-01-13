@@ -31,7 +31,6 @@ namespace Graven
 
         Texture2D spadeIcon, treeTex, inventoryTex, mouseTex;
         
-        //Tile[,] tiles;
         Layer[] layers;
         Level level;
         Random rand = new Random();
@@ -47,9 +46,8 @@ namespace Graven
         float frameCount, timeCount, fps, sinceLast;
 
         Color textRed = new Color(255, 255, 255);
-        WaterDrop[,] droplets;
 
-        float dropCount;
+        RenderTarget2D screenshot;
 
         #endregion
 
@@ -79,7 +77,7 @@ namespace Graven
             treeTex = Content.Load<Texture2D>("tree");
             inventoryTex = Content.Load<Texture2D>("inventory");
             mouseTex = Content.Load<Texture2D>("mouse");
-            
+           
             base.Initialize();
         }
 
@@ -98,37 +96,53 @@ namespace Graven
             }
         }
 
-        //public void setupDrops()
-        //{
-        //    droplets = new WaterDrop[levelOne.Height, levelOne.Width];
-        //    Random rand = new Random();
-        //    for (int y = 0; y < levelOne.Height; y++)
-        //    {
-        //        for (int x = 0; x < levelOne.Width; x++)
-        //        {
-        //            droplets[y, x] = new WaterDrop(graphics.GraphicsDevice, x, y, levelWidth, levelHeight, 0);
-        //        }
-        //    }
-        //}
-
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-
             level.loadTextures(Content);
             player = new Player(screenRectangle, level.levelHeight, level.levelWidth);
             player.texture = Content.Load<Texture2D>("player");
             level.setUpTile("Levels/levelOne.png", player, camera);
-            
+            level.dropManager = new DropManager(level.levelTileWidth, level.levelTileHeight, screenWidth, screenHeight);
+            level.dropManager.setupDrops();
+            level.dropManager.loadTextures(Content);
+            layers[0] = new Layer(Content, "backgrounds/clouds", new Vector2(0.1f,0.01f));
 
-            layers[0] = new Layer(Content, "backgrounds/clouds", 0.1f);
-           // layers[1] = new Layer(Content, "backgrounds/hills", 0.3f);
+         
+
         }
 
         protected override void UnloadContent()
         {
+     
         }
+        public void ScreenShot(string prefix)
+        {
+            #if WINDOWS
+                int w = GraphicsDevice.PresentationParameters.BackBufferWidth;
+                int h = GraphicsDevice.PresentationParameters.BackBufferHeight;
+
+                //force a frame to be drawn (otherwise back buffer is empty)
+                Draw(new GameTime());
+
+                //pull the picture from the buffer
+                int[] backBuffer = new int[w * h];
+                GraphicsDevice.GetBackBufferData(backBuffer);
+
+                //copy into a texture
+                Texture2D texture = new Texture2D(GraphicsDevice, w, h, false, GraphicsDevice.PresentationParameters.BackBufferFormat);
+                texture.SetData(backBuffer);
+
+                //save to disk
+                Stream stream = File.OpenWrite(prefix + "_" + Guid.NewGuid().ToString() + ".png");
+                texture.SaveAsPng(stream, w, h);
+                stream.Close();
+
+            #elif XBOX
+                throw new NotSupportedException();
+            #endif
+            }
+
 
         protected override void Update(GameTime gameTime)
         {
@@ -162,23 +176,23 @@ namespace Graven
                 if (keyS.IsKeyDown(Keys.X))
                 {
                     waterCheck = totalElapsed;
-                   // makeDrop(14.0f);
+                    level.dropManager.makeDrop(14.0f, camera.position);
                 }
                 else if (keyS.IsKeyDown(Keys.C))
                 {
                     waterCheck = totalElapsed;
-                   // makeDrop(0.0f);
+                    level.dropManager.makeDrop(0.0f, camera.position);
                 }
                 else if (keyS.IsKeyDown(Keys.Delete))
                 {
                     waterCheck = totalElapsed;
-                    //clearDrops();
+                    level.dropManager.emptyDrops();
                 }
 
                 else if (keyS.IsKeyDown(Keys.R))
                 {
                     waterCheck = totalElapsed;
-                    //clearDrops();
+                    level.dropManager.emptyDrops();
                     level.setUpTile("Levels/levelOne.png", player, camera);
                 }
                 else if (keyS.IsKeyDown(Keys.T))
@@ -193,13 +207,18 @@ namespace Graven
                     player.activeInventorySlot = 0;
                     level.setTile(TileType.Empty, camera, player);
                 }
+                else if (keyS.IsKeyDown(Keys.F12))
+                {
+                    waterCheck = totalElapsed;
+                    ScreenShot("screenshot1");
+                }
                 else if (keyS.IsKeyDown(Keys.D2))
                 {
                     waterCheck = totalElapsed;
                     player.activeInventorySlot = 1;
                     level.setTile(TileType.Decoration, camera, player, 0);
                 }
-                else if (keyS.IsKeyDown(Keys.D3) || Mouse.GetState().RightButton == ButtonState.Pressed)
+                else if (keyS.IsKeyDown(Keys.D3))
                 {
                     waterCheck = totalElapsed;
                     player.activeInventorySlot = 2;
@@ -262,57 +281,13 @@ namespace Graven
             if (totalElapsed >= pressCheckDelay)
             {
                 pressCheckDelay = totalElapsed;
-              /*
-               * if (keyS.IsKeyDown(Keys.Left))
-                {
-                    waterCheck = totalElapsed;
-                    if (cameraPosition.X > 32)
-                        cameraPosition.X -= 32;
-                    else
-                        cameraPosition.X = 0;
-                }
-                else if (keyS.IsKeyDown(Keys.Right))
-                {
-                    waterCheck = totalElapsed;
-                    if (cameraPosition.X + 32 < totalWidth - screenWidth)
-                        cameraPosition.X += 32;
-                    else
-                        cameraPosition.X = totalWidth - screenWidth;
-                }
-               * 
-                //player.checkKeys(keyS, cameraPosition);
-               */
-
-                if (keyS.IsKeyDown(Keys.D))
-                {
-                    if (player.position.X - camera.position.X >= 800)
-                        camera.position.X += 2;
-                }
-
-                if (keyS.IsKeyDown(Keys.A))
-                {
-                    if (player.position.X - camera.position.X >= 100)
-                    {
-                        if (camera.position.X > 0)
-                            camera.position.X -= 2;
-                    }
-                }
             }
 
             #endregion
 
             #region Update Water and Tiles
 
-            //if (!pauseWater)
-            //{
-            //    for (int y = 0; y < levelHeight - 1; y++)
-            //    {
-            //        for (int x = 0; x < levelWidth - 1; x++)
-            //        {
-            //            droplets[y, x].Update(ref tiles, ref droplets, totalElapsed);
-            //        }
-            //    }
-            //}
+            level.dropManager.updateWater(camera, ref level.tileLayers, totalElapsed);
 
             level.updateTiles(totalElapsed, camera);
 
@@ -320,7 +295,7 @@ namespace Graven
 
             player.Update(ref level.tileLayers, keyS, gameTime, camera.position);
 
-            if (camera.getCameraX(0) >= 0)
+            if (player.position.X - camera.getCameraX(0)  >= 600)
                 camera.position.X = player.position.X - screenWidthHalf;
             else
                 camera.position.X = 0;
@@ -380,7 +355,7 @@ namespace Graven
             level.drawTiles(camera, spriteBatch);
 
             player.Draw(spriteBatch);
-            //drawDroplets();
+            level.dropManager.drawDroplets(camera, spriteBatch);
             UpdateMouse();
             drawInventory();
             if (DEBUG)
@@ -390,10 +365,11 @@ namespace Graven
             base.Draw(gameTime);
         }
 
+
+
         public void DrawDebug()
         {
             fpsCount.Draw(spriteBatch, font);
-            spriteBatch.DrawString(font, "Droplets: " + dropCount.ToString(), new Vector2(10, 25), textRed);
             spriteBatch.DrawString(font, "Water: " + (pauseWater ? "Paused" : "Running"), new Vector2(10, 40), textRed);
             spriteBatch.DrawString(font, "Camera : " + camera.position.ToString(), new Vector2(10, 55), textRed);
             spriteBatch.DrawString(font, "Player : " + player.position.ToString() + " Velo " + player.velocity.ToString(), new Vector2(10, 70), textRed);
@@ -402,58 +378,6 @@ namespace Graven
             spriteBatch.DrawString(font, "Block Count : " + player.blockCount.ToString(), new Vector2(10, 115), textRed);
             spriteBatch.DrawString(font, "Scroll : " + mouseScroll.ToString(), new Vector2(10, 145), textRed);
         }
-        //public void countDrops()
-        //{
-        //    dropCount = 0;
-
-        //    for (int y = getCameraPosY(0); y < getCameraPosY(screenHeight) - 1; y++)
-        //    {
-        //        for (int x = getCameraPosX(0); x < getCameraPosX(screenWidth) - 1; x++)
-        //        {
-        //            dropCount += droplets[y, x].volume;
-        //        }
-        //    }
-        //}
-
-        //public void clearDrops()
-        //{
-        //    for (int y = 0; y < levelHeight; y++)
-        //    {
-        //        for (int x = 0; x < levelWidth; x++)
-        //        {
-        //            droplets[y, x].volume = 0;
-        //        }
-        //    }
-        //}
-
-        //public void drawDroplets()
-        //{
-        //    for (int y = getCameraPosY(0); y < getCameraPosY(screenHeight); y++)
-        //    {
-        //        for (int x = getCameraPosX(0); x < getCameraPosX(screenWidth); x++)
-        //        {
-        //            if (droplets[y,x].topMost && droplets[y,x].waterSand)
-        //                droplets[y, x].Draw(cameraPosition, spriteBatch, ref waterSandTop);
-        //            else if (droplets[y, x].topMost && droplets[y, x].waterSand == false)
-        //                droplets[y, x].Draw(cameraPosition, spriteBatch, ref topMost);
-        //           else if (droplets[y,x].waterSand &&  droplets[y,x].topMost == false)
-        //                droplets[y, x].Draw(cameraPosition, spriteBatch, ref waterSand);
-        //           else
-        //                droplets[y, x].Draw(cameraPosition, spriteBatch, ref WaterDropTex);
-        //        }
-        //    }
-        //}
-
-        //public void makeDrop(float amount)
-        //{
-        //    int mouse_x = Mouse.GetState().X - 4 + (int)cameraPosition.X;
-        //    int mouse_y = Mouse.GetState().Y - 4;
-
-        //    if (mouse_x > 0 && mouse_x < totalWidth && mouse_y > 0 && mouse_y < totalHeight)
-        //    {
-        //        droplets[mouse_y / 16, mouse_x / 16].volume = amount;
-        //    }
-        //}
 
         public int grabX(int tileX, int newX = 0)
         {
