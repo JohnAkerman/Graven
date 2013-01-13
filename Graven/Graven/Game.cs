@@ -210,7 +210,7 @@ namespace Graven
                 else if (keyS.IsKeyDown(Keys.F12))
                 {
                     waterCheck = totalElapsed;
-                    ScreenShot("screenshot1");
+                    ScreenShot("Screenshots/screenshot1");
                 }
                 else if (keyS.IsKeyDown(Keys.D2))
                 {
