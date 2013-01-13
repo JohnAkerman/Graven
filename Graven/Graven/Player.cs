@@ -36,6 +36,7 @@ namespace Graven
         private bool wasJumping;
         private bool isOnGround;
         public int blockCount = 0;
+        public float lightValue;
 
         public int[] inventoryCount = new int[5];
         public InventoryType[] inventoryTypes = new InventoryType[5];

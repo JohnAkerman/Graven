@@ -27,7 +27,7 @@ namespace Graven
         #region Textures
 
         Texture2D currentLevel;
-        Texture2D tileGrassTop, tileDirt, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, tileMetal;
+        Texture2D tileGrassTop, tileDirt, WaterDropTex, mouseTex, sandTex, waterSand, topMost, waterSandTop, tileMetal, darkTex;
         
         #endregion
 
@@ -44,6 +44,8 @@ namespace Graven
             waterSand = Content.Load<Texture2D>("Tiles/watersand");
             topMost = Content.Load<Texture2D>("Tiles/topmost");
             waterSandTop = Content.Load<Texture2D>("Tiles/watersandtop");
+            darkTex = Content.Load<Texture2D>("Tiles/dark");
+
         }
 
         public Level(int screenHeight, int screenWidth) {
@@ -66,18 +68,59 @@ namespace Graven
             }
         }
 
-        public void calculateTiles()
+        public void calculateTiles(Camera cam, Player player)
         {
             for (int y = 0; y < currentLevel.Height; y++)
             {
                 for (int x = 0; x < currentLevel.Width; x++)
                 {
                     tileLayers[1, y, x].calculateOrientation(ref tileLayers);
+                  
+                }
+            }
+
+           // resetLightingCount(cam);
+            //createLighting(cam);
+            tileLayers[1, 0, 0].updateLight(ref tileLayers, player);
+           
+        }
+
+        public void createLighting(Camera cam)
+        {
+            for (int y = 0; y < currentLevel.Height; y++)
+            {
+                for (int x = 0; x < currentLevel.Width; x++)
+                {
+                    if (x < 0 || y < 0 ||  x >= levelTileWidth || y >= levelTileHeight) 
+                        continue;
+
+                    if (tileLayers[1, y, x] != null && tileLayers[1, y, x].render)
+                    {
+                        tileLayers[1, y, x].calculateOrientation(ref tileLayers);                       
+                    }
                 }
             }
         }
 
-        public void setUpTile(string path, Player player)
+        public void resetLightingCount(Camera cam)
+        {
+            for (int y = 0; y < currentLevel.Height; y++)
+            {
+                for (int x = 0; x < currentLevel.Width; x++)
+                {
+                    if (x < 0 || y < 0 || x >= levelTileWidth || y >= levelTileHeight)
+                        continue;
+
+                    if (tileLayers[1, y, x] != null && tileLayers[1, y, x].render)
+                    {
+                        tileLayers[1, y, x].lightingHits = 0;
+                        tileLayers[1, y, x].lightValue = 0;
+                    }
+                }
+            }
+        }
+
+        public void setUpTile(string path, Player player, Camera cam)
         {
             Color[] levelData = new Color[currentLevel.Height * currentLevel.Width];
 
@@ -132,8 +175,19 @@ namespace Graven
                 }
             }
 
-            calculateTiles();
+            calculateTiles(cam, player);
+
+
+            //for (int y = 0; y < currentLevel.Height; y++)
+            //{
+            //    for (int x = 0; x < currentLevel.Width; x++)
+            //    {
+            //        tileLayers[1, y, x].updateLighting(ref tileLayers);
+            //    }
+            //}
         }
+
+       
 
         public bool setTile(TileType tileIn, Camera camera, int decoration = -1)
         {
@@ -150,7 +204,10 @@ namespace Graven
                         tileLayers[1, mouse_y / 16, mouse_x / 16].tileCollision = TileCollision.Passable;
                     else
                         tileLayers[1, mouse_y / 16, mouse_x / 16].tileCollision = TileCollision.Impassable;
-                    calculateTiles();
+
+                   // resetLightingCount(camera);
+                   // createLighting(camera);
+                   // calculateTiles(camera, player);
 
                     return true;
                 }
@@ -159,9 +216,7 @@ namespace Graven
             }
             else
                 return false;
-
         }
-
 
         public void setTileHealth(Camera camera, Player player)
         {
@@ -181,7 +236,9 @@ namespace Graven
                 tmpBlock = tileLayers[1, mouseY, mouseX].tileType;
                 if (tileLayers[1,mouseY, mouseX].doDamage() == true)
                 {
-                    calculateTiles();
+                    //createLighting(camera);
+                    calculateTiles(camera, player);
+
                     delta = player.getMiddle() - tileLayers[1, mouseY, mouseX].getMiddle();
 
                     if (Math.Abs(delta.X) <= 32 && Math.Abs(delta.Y) <= 32) // Player in range collect block
@@ -256,6 +313,8 @@ namespace Graven
                                 sb.Draw(tileMetal, tileLayers[z, y, x].position - cam.position, new Rectangle(16 * (int)tileLayers[z, y, x].tileOrientation, 16 * (int)tileLayers[z, y, x].damage, 16, 16), Color.White);
                                 break;
                         }
+
+                        sb.Draw(darkTex, tileLayers[z, y, x].position - cam.position, new Color(0, 0, 0, (1.0f - tileLayers[z, y, x].lightValue)));
                     }
                 }
             }

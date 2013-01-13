@@ -205,7 +205,7 @@ namespace Graven
             level.loadTextures(Content);
             player = new Player(screenRectangle, level.levelHeight, level.levelWidth);
             player.texture = Content.Load<Texture2D>("player");
-            level.setUpTile("Levels/levelOne.png", player);
+            level.setUpTile("Levels/levelOne.png", player, camera);
             
 
             layers[0] = new Layer(Content, "backgrounds/clouds", 0.1f);
@@ -238,7 +238,7 @@ namespace Graven
             KeyboardState keyS = Keyboard.GetState();
             MouseState mState = Mouse.GetState();
 
-           //  int mouseScroll = (int)Mouse.GetState().ScrollWheelValue / 120;
+           int mouseScroll = (int)Mouse.GetState().ScrollWheelValue / 120;
             
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || keyS.IsKeyDown(Keys.Escape))
                 this.Exit();
@@ -265,7 +265,7 @@ namespace Graven
                 {
                     waterCheck = totalElapsed;
                     //clearDrops();
-                    level.setUpTile("Levels/levelOne.png", player);
+                    level.setUpTile("Levels/levelOne.png", player, camera);
                 }
                 else if (keyS.IsKeyDown(Keys.T))
                 {
@@ -400,7 +400,7 @@ namespace Graven
             //    }
             //}
 
-            //level.updateTiles(totalElapsed, camera);
+            level.updateTiles(totalElapsed, camera);
 
             //for (int y = 0; y < levelHeight - 1; y++)
             //{
@@ -462,7 +462,19 @@ namespace Graven
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+           // spriteBatch.Begin();
+
+            BlendState bs = new BlendState();
+
+            bs.ColorWriteChannels = ColorWriteChannels.Alpha;
+            bs.AlphaBlendFunction = BlendFunction.Min;
+            bs.AlphaSourceBlend = Blend.One;
+            bs.AlphaDestinationBlend = Blend.One;
+
+            //spriteBatch.Begin(SpriteSortMode.Immediate, bs);
             spriteBatch.Begin();
+
+            //spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None); //spriteBatch.Begin();
 
             for (int i = 0; i < layers.Length; i++)
             {
