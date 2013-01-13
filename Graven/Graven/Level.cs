@@ -145,6 +145,8 @@ namespace Graven
                         tileLayers[1, y, x] = new Tile(TileType.Tree, x, y, levelTileWidth, levelTileHeight, rand, TileCollision.Passable, 2);
                     else if (levelData[runningTotal] == new Color(119, 119, 119)) // Metal
                         tileLayers[1, y, x] = new Tile(TileType.Metal, x, y, levelTileWidth, levelTileHeight, rand, TileCollision.Impassable);
+                    else if (levelData[runningTotal] == Color.Black) // Indestructable
+                        tileLayers[1, y, x] = new Tile(TileType.Indestructable, x, y, levelTileWidth, levelTileHeight, rand, TileCollision.Impassable);
                     else if (levelData[runningTotal] == new Color(255, 0, 0)) // Player start
                     {
                         tileLayers[1, y, x] = new Tile(TileType.Empty, x, y, levelTileWidth, levelTileHeight, rand, TileCollision.Passable);

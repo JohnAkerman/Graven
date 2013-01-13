@@ -76,7 +76,10 @@ namespace Graven
             {
                 for (int x = cam.getCameraX(0); x < cam.getCameraX(screenWidth); x++)
                 {
-                    droplets[y, x].Update(ref tiles, ref droplets, totalElapsed);
+                    if (x < levelWidth - 1 && x > 0 && y <= levelHeight - 1 && y > 0)
+                    {
+                        droplets[y, x].Update(ref tiles, ref droplets, totalElapsed);
+                    }
                 }
             }
         }
@@ -87,14 +90,17 @@ namespace Graven
             {
                 for (int x = cam.getCameraX(0); x < cam.getCameraX(screenWidth); x++)
                 {
-                    if (droplets[y, x].topMost && droplets[y, x].waterSand)
-                        droplets[y, x].Draw(cam.position, sb, ref waterSandTop);
-                    else if (droplets[y, x].topMost && droplets[y, x].waterSand == false)
-                        droplets[y, x].Draw(cam.position, sb, ref topMost);
-                    else if (droplets[y, x].waterSand && droplets[y, x].topMost == false)
-                        droplets[y, x].Draw(cam.position, sb, ref waterSand);
-                    else
-                        droplets[y, x].Draw(cam.position, sb, ref WaterDropTex);
+                    if (x < levelWidth - 1 && x > 0 && y <= levelHeight - 1 && y > 0)
+                    {
+                        if (droplets[y, x].topMost && droplets[y, x].waterSand)
+                            droplets[y, x].Draw(cam.position, sb, ref waterSandTop);
+                        else if (droplets[y, x].topMost && droplets[y, x].waterSand == false)
+                            droplets[y, x].Draw(cam.position, sb, ref topMost);
+                        else if (droplets[y, x].waterSand && droplets[y, x].topMost == false)
+                            droplets[y, x].Draw(cam.position, sb, ref waterSand);
+                        else
+                            droplets[y, x].Draw(cam.position, sb, ref WaterDropTex);
+                    }
                 }
             }
         }

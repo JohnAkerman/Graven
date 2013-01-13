@@ -19,7 +19,7 @@ namespace Graven
         Tree,
         Metal,
         Light,
-
+        Indestructable
     }
 
     public enum TileCollision
@@ -104,8 +104,18 @@ namespace Graven
          *   
          */
 
+        public bool checkDestructable()
+        {
+            if (tileType == TileType.Indestructable)
+                return false;
+            else
+                return true;
+        }
         public bool doDamage()
         {
+            if (checkDestructable() == false)
+                return false;
+
             if (tileType == TileType.Metal)
             {
                 if (hitsRequired >= 1)
@@ -393,7 +403,7 @@ namespace Graven
         */
         public void updateTile(ref Tile[,,] tiles, float elapsedTime, Vector2 camPos)
         {
-
+            if (checkDestructable() == false) return;
             tileX = getTileCoords("X");
             tileY = getTileCoords("Y");
 

@@ -22,6 +22,7 @@ namespace Graven
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle screenRectangle;
+        Color bgColor = new Color(167, 214, 232);
         const int screenHeight = 800;
         const int screenWidth = 1200;
         const int screenHeightHalf = screenHeight / 2;
@@ -290,10 +291,8 @@ namespace Graven
             else
                 camera.position.X = 0;
 
-            if (camera.getCameraY(0) >= 0)
+            if (player.position.Y - camera.getCameraY(0) <= level.levelHeight - screenHeightHalf - 100)
                 camera.position.Y = player.position.Y - screenHeightHalf;
-            else
-                camera.position.Y = 0;
 
             player.updateInventory();
 
@@ -334,7 +333,7 @@ namespace Graven
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(bgColor);
             spriteBatch.Begin();
 
             for (int i = 0; i < layers.Length; i++)
