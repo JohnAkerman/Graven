@@ -18,7 +18,7 @@ If you delete the blocks below and fall past it will crash the game. Easy fix bu
 
 Screenshot
 ----------
-![Early build, water and lighting tiles](/screenshots/GravenUpdate.png "Early Build")
+![Early build, water and lighting tiles](https://github.com/JohnAkerman/Graven/blob/master/Screenshots/GravenUpdate.png "Early Build")
 
 
 Usage
