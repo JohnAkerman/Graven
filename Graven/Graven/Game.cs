@@ -106,10 +106,7 @@ namespace Graven
             level.dropManager = new DropManager(level.levelTileWidth, level.levelTileHeight, screenWidth, screenHeight);
             level.dropManager.setupDrops();
             level.dropManager.loadTextures(Content);
-            layers[0] = new Layer(Content, "backgrounds/clouds", new Vector2(0.1f,0.01f));
-
-         
-
+            layers[0] = new Layer(Content, "backgrounds/clouds", new Vector2(0.1f,0.01f), new Vector2(2000, 1101), true, 60);
         }
 
         protected override void UnloadContent()
@@ -205,7 +202,6 @@ namespace Graven
                 {
                     waterCheck = totalElapsed;
                     player.activeInventorySlot = 0;
-                    level.setTile(TileType.Empty, camera, player);
                 }
                 else if (keyS.IsKeyDown(Keys.F12))
                 {
@@ -216,31 +212,21 @@ namespace Graven
                 {
                     waterCheck = totalElapsed;
                     player.activeInventorySlot = 1;
-                    level.setTile(TileType.Decoration, camera, player, 0);
                 }
                 else if (keyS.IsKeyDown(Keys.D3))
                 {
                     waterCheck = totalElapsed;
                     player.activeInventorySlot = 2;
-                  /*  if (player.blockCount > 0)
-                    {
-                        setTile(TileType.Dirt);
-                        player.blockCount--;
-                    }
-                    */
-
                 }
                 else if (keyS.IsKeyDown(Keys.D4))
                 {
                     player.activeInventorySlot = 3;
                     waterCheck = totalElapsed;
-                    level.setTile(TileType.Sand, camera, player);
                 }
                 else if (keyS.IsKeyDown(Keys.D5))
                 {
                     player.activeInventorySlot = 4;
                     waterCheck = totalElapsed;
-                    level.setTile(TileType.Decoration, camera, player, 1);
                 }
                 else if (prevMouseScroll != mouseScroll)
                 {
@@ -286,6 +272,10 @@ namespace Graven
             #endregion
 
             #region Update Water and Tiles
+
+            foreach (Layer layer in layers) {
+                layer.updateFrame(gameTime);
+            }
 
             level.dropManager.updateWater(camera, ref level.tileLayers, totalElapsed);
 
