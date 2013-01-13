@@ -53,10 +53,9 @@ namespace Graven
             this.screenWidth = screenWidth;
             screenTilesWidth = this.screenWidth / tileSize;
             screenTilesHeight = this.screenHeight / tileSize;
-
         }
 
-        public void resetTiles()
+      /*  public void resetTiles()
         {
             tileLayers = new Tile[2, currentLevel.Height, currentLevel.Width];
             for (int y = 0; y < levelHeight; y++)
@@ -66,11 +65,11 @@ namespace Graven
                     tileLayers[1, y, x] = new Tile(TileType.Empty, x, y, levelHeight, levelHeight, rand, TileCollision.Passable);
                 }
             }
-        }
+        }*/
 
-        public void calculateTiles(Camera cam, Player player)
+        public void calculateTiles(Camera cam, Player player, bool initialLoad = false)
         {
-            for (int y = 0; y < currentLevel.Height; y++)
+           for (int y = 0; y < currentLevel.Height; y++)
             {
                 for (int x = 0; x < currentLevel.Width; x++)
                 {
@@ -78,14 +77,10 @@ namespace Graven
                   
                 }
             }
-
-           // resetLightingCount(cam);
-            //createLighting(cam);
-            tileLayers[1, 0, 0].updateLight(ref tileLayers, player);
-           
+            tileLayers[1, 0, 0].updateLight(ref tileLayers, player, initialLoad);
         }
 
-        public void createLighting(Camera cam)
+    /*    public void createLighting(Camera cam)
         {
             for (int y = 0; y < currentLevel.Height; y++)
             {
@@ -100,9 +95,9 @@ namespace Graven
                     }
                 }
             }
-        }
+        }*/
 
-        public void resetLightingCount(Camera cam)
+    /*    public void resetLightingCount(Camera cam)
         {
             for (int y = 0; y < currentLevel.Height; y++)
             {
@@ -119,7 +114,7 @@ namespace Graven
                 }
             }
         }
-
+        */
         public void setUpTile(string path, Player player, Camera cam)
         {
             Color[] levelData = new Color[currentLevel.Height * currentLevel.Width];
@@ -175,21 +170,10 @@ namespace Graven
                 }
             }
 
-            calculateTiles(cam, player);
-
-
-            //for (int y = 0; y < currentLevel.Height; y++)
-            //{
-            //    for (int x = 0; x < currentLevel.Width; x++)
-            //    {
-            //        tileLayers[1, y, x].updateLighting(ref tileLayers);
-            //    }
-            //}
+            calculateTiles(cam, player, true);
         }
 
-       
-
-        public bool setTile(TileType tileIn, Camera camera, int decoration = -1)
+        public bool setTile(TileType tileIn, Camera camera, Player player, int decoration = -1)
         {
             int mouse_x = Mouse.GetState().X - 4 + (int)camera.position.X;
             int mouse_y = Mouse.GetState().Y - 4 + (int)camera.position.Y;
@@ -205,9 +189,7 @@ namespace Graven
                     else
                         tileLayers[1, mouse_y / 16, mouse_x / 16].tileCollision = TileCollision.Impassable;
 
-                   // resetLightingCount(camera);
-                   // createLighting(camera);
-                   // calculateTiles(camera, player);
+                   calculateTiles(camera, player);
 
                     return true;
                 }
@@ -231,12 +213,14 @@ namespace Graven
                 int mouseX = (mouse_x + (int)camera.position.X) / 16;
                 int mouseY = (mouse_y + (int)camera.position.Y) / 16;
 
+                if (mouseY > levelHeight)
+                    return;
+
                 if (tileLayers[1, grabY(mouseY, -1), mouseX].tileType == TileType.Tree) { return; }
 
                 tmpBlock = tileLayers[1, mouseY, mouseX].tileType;
                 if (tileLayers[1,mouseY, mouseX].doDamage() == true)
                 {
-                    //createLighting(camera);
                     calculateTiles(camera, player);
 
                     delta = player.getMiddle() - tileLayers[1, mouseY, mouseX].getMiddle();

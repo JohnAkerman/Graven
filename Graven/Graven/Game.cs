@@ -18,6 +18,7 @@ namespace Graven
         
         #region Initialisations.
 
+        FrameRateCounter fpsCount;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle screenRectangle;
@@ -68,7 +69,8 @@ namespace Graven
             level = new Level(screenHeight, screenWidth);
             layers = new Layer[1];
             camera = new Camera(new Vector2(0, 0));
-           }
+            fpsCount = new FrameRateCounter();
+          }
 
         protected override void Initialize()
         {
@@ -77,95 +79,9 @@ namespace Graven
             treeTex = Content.Load<Texture2D>("tree");
             inventoryTex = Content.Load<Texture2D>("inventory");
             mouseTex = Content.Load<Texture2D>("mouse");
+            
             base.Initialize();
         }
-
-        /*
-        public void resetTiles()
-        {
-            tiles = new Tile[levelHeight, levelWidth];
-            for (int y = 0; y < levelHeight; y++)
-            {
-                for (int x = 0; x < levelWidth; x++)
-                {
-                    tiles[y, x] = new Tile(TileType.Empty, x, y, levelWidth, levelHeight, rand, TileCollision.Passable);
-                }
-            }
-
-            calculateTiles();
-        }
-         * 
-         */
-
-       /*
-        private void setUpTile(string Path)
-        {
-         //   resetTiles();
-            Color[] levelData = new Color[levelOne.Height * levelOne.Width];
-
-            tiles = null;
-            tiles = new Tile[levelOne.Height, levelOne.Width]; // Height, Width
-
-            levelOne.GetData<Color>(levelData);
-
-            int runningTotal = 0;
-
-            for (int y = 0; y < levelOne.Height; y++)
-            {
-                for (int x = 0; x < levelOne.Width; x++)
-                {
-                    if (runningTotal >= levelData.Length)
-                    {
-                        break;
-                    }
-
-                    if (levelData[runningTotal] == Color.Lime)
-                    {
-                        tiles[y, x] = new Tile(TileType.Decoration, x, y, levelWidth, levelHeight, rand, 0);
-                    }
-                    else if (levelData[runningTotal] == Color.Blue)
-                    {
-                        tiles[y, x] = new Tile(TileType.Dirt, x, y, levelWidth, levelHeight, rand, TileCollision.Impassable);
-                    }
-                    else if (levelData[runningTotal] == Color.White)
-                    {
-                        tiles[y, x] = new Tile(TileType.Empty, x, y, levelWidth, levelHeight, rand, TileCollision.Passable);
-                    }
-                    else if (levelData[runningTotal] == Color.Yellow)
-                    {
-                        tiles[y, x] = new Tile(TileType.Sand, x, y, levelWidth, levelHeight, rand, TileCollision.Impassable);
-                    }
-                    else if (levelData[runningTotal] == new Color(204,204,204))
-                    {
-                        tiles[y, x] = new Tile(TileType.Decoration, x, y, levelWidth, levelHeight, rand,TileCollision.Passable,  1);
-                    }
-                    else if (levelData[runningTotal] == new Color(53, 34, 18)) // Tree Foot
-                    {
-                        tiles[y, x] = new Tile(TileType.Tree, x, y, levelWidth, levelHeight, rand, TileCollision.Passable, 0);
-                    }
-                    else if (levelData[runningTotal] == new Color(109, 69, 35)) // Tree Truck
-                    {
-                        tiles[y, x] = new Tile(TileType.Tree, x, y, levelWidth, levelHeight, rand, TileCollision.Passable, 1);
-                    }
-                    else if (levelData[runningTotal] == new Color(24, 100, 12)) // Tree Top
-                    {
-                        tiles[y, x] = new Tile(TileType.Tree, x, y, levelWidth, levelHeight, rand, TileCollision.Passable, 2);
-                    }
-                    else if (levelData[runningTotal] == new Color(119, 119, 119)) // Metal
-                    {
-                        tiles[y, x] = new Tile(TileType.Metal, x, y, levelWidth, levelHeight, rand, TileCollision.Impassable);
-                    }
-                    runningTotal++;
-                }
-            }
-
-           
-            calculateTiles();
-        }
-        */
-
-        
-
 
         private void UpdateMouse()
         {           
@@ -179,8 +95,6 @@ namespace Graven
                     spriteBatch.Draw(spadeIcon, new Vector2(mouse_x, mouse_y-8) - camera.position, Color.White);
                 else
                     spriteBatch.Draw(mouseTex, new Vector2(mouse_x, mouse_y) - camera.position, Color.White);
-
-               // spriteBatch.DrawString(font, "Tile Health: " + tiles[mouse_y / 16, mouse_x / 16].health.ToString(), new Vector2(10, 80), textRed);
             }
         }
 
@@ -277,13 +191,13 @@ namespace Graven
                 {
                     waterCheck = totalElapsed;
                     player.activeInventorySlot = 0;
-                    level.setTile(TileType.Empty, camera);
+                    level.setTile(TileType.Empty, camera, player);
                 }
                 else if (keyS.IsKeyDown(Keys.D2))
                 {
                     waterCheck = totalElapsed;
                     player.activeInventorySlot = 1;
-                    level.setTile(TileType.Decoration, camera, 0);
+                    level.setTile(TileType.Decoration, camera, player, 0);
                 }
                 else if (keyS.IsKeyDown(Keys.D3) || Mouse.GetState().RightButton == ButtonState.Pressed)
                 {
@@ -301,13 +215,13 @@ namespace Graven
                 {
                     player.activeInventorySlot = 3;
                     waterCheck = totalElapsed;
-                    level.setTile(TileType.Sand, camera);
+                    level.setTile(TileType.Sand, camera, player);
                 }
                 else if (keyS.IsKeyDown(Keys.D5))
                 {
                     player.activeInventorySlot = 4;
                     waterCheck = totalElapsed;
-                    level.setTile(TileType.Decoration,camera, 1);
+                    level.setTile(TileType.Decoration, camera, player, 1);
                 }
                 else if (prevMouseScroll != mouseScroll)
                 {
@@ -329,7 +243,7 @@ namespace Graven
                         case Player.InventoryType.DirtTile:
                             if (player.inventoryCount[player.activeInventorySlot] > 0)
                             {
-                                if (level.setTile(TileType.Dirt, camera))
+                                if (level.setTile(TileType.Dirt, camera, player))
                                     player.inventoryCount[player.activeInventorySlot]--;
                             }
                             break;
@@ -337,7 +251,7 @@ namespace Graven
                         case Player.InventoryType.MetalTile:
                             if (player.inventoryCount[player.activeInventorySlot] > 0)
                             {
-                                if (level.setTile(TileType.Metal, camera))
+                                if (level.setTile(TileType.Metal, camera, player))
                                     player.inventoryCount[player.activeInventorySlot]--;
                             }
                             break;
@@ -402,14 +316,6 @@ namespace Graven
 
             level.updateTiles(totalElapsed, camera);
 
-            //for (int y = 0; y < levelHeight - 1; y++)
-            //{
-            //    for (int x = 0; x < levelWidth - 1; x++)
-            //    {
-            //        tiles[y, x].updateTile(ref tiles, totalElapsed, camera);
-            //    }
-            //}
-
             #endregion
 
             player.Update(ref level.tileLayers, keyS, gameTime, camera.position);
@@ -427,6 +333,8 @@ namespace Graven
             player.updateInventory();
 
             prevMouseScroll = mouseScroll;
+
+            fpsCount.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -462,19 +370,7 @@ namespace Graven
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-           // spriteBatch.Begin();
-
-            BlendState bs = new BlendState();
-
-            bs.ColorWriteChannels = ColorWriteChannels.Alpha;
-            bs.AlphaBlendFunction = BlendFunction.Min;
-            bs.AlphaSourceBlend = Blend.One;
-            bs.AlphaDestinationBlend = Blend.One;
-
-            //spriteBatch.Begin(SpriteSortMode.Immediate, bs);
             spriteBatch.Begin();
-
-            //spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None); //spriteBatch.Begin();
 
             for (int i = 0; i < layers.Length; i++)
             {
@@ -486,28 +382,25 @@ namespace Graven
             player.Draw(spriteBatch);
             //drawDroplets();
             UpdateMouse();
-           // countDrops();
-
             drawInventory();
             if (DEBUG)
                DrawDebug();
 
             spriteBatch.End();
-            
             base.Draw(gameTime);
         }
 
         public void DrawDebug()
         {
-            spriteBatch.DrawString(font, "FPS: " + fps.ToString(), new Vector2(10,10), textRed); 
-            //spriteBatch.DrawString(font, "Droplets: " + dropCount.ToString(), new Vector2(10, 25), textRed);
-            //spriteBatch.DrawString(font, "Water: " + (pauseWater ? "Paused" : "Running"), new Vector2(10, 40), textRed);
-            //spriteBatch.DrawString(font, "Camera : " + camera.position.ToString(), new Vector2(10, 55), textRed);
-            //spriteBatch.DrawString(font, "Player : " + player.position.ToString() + " Velo "  + player.velocity.ToString(), new Vector2(10, 70), textRed);
-            //spriteBatch.DrawString(font, "Diff : " + (player.position.X - camera.position.X), new Vector2(10, 85), textRed);
-            //spriteBatch.DrawString(font, "Player CAM : " + player.cameraPosition.ToString(), new Vector2(10, 100), textRed);
-            //spriteBatch.DrawString(font, "Block Count : " + player.blockCount.ToString(), new Vector2(10, 115), textRed);
-            //spriteBatch.DrawString(font, "Scroll : " + mouseScroll.ToString(), new Vector2(10, 145), textRed);
+            fpsCount.Draw(spriteBatch, font);
+            spriteBatch.DrawString(font, "Droplets: " + dropCount.ToString(), new Vector2(10, 25), textRed);
+            spriteBatch.DrawString(font, "Water: " + (pauseWater ? "Paused" : "Running"), new Vector2(10, 40), textRed);
+            spriteBatch.DrawString(font, "Camera : " + camera.position.ToString(), new Vector2(10, 55), textRed);
+            spriteBatch.DrawString(font, "Player : " + player.position.ToString() + " Velo " + player.velocity.ToString(), new Vector2(10, 70), textRed);
+            spriteBatch.DrawString(font, "Diff : " + (player.position.X - camera.position.X), new Vector2(10, 85), textRed);
+            spriteBatch.DrawString(font, "Player CAM : " + player.cameraPosition.ToString(), new Vector2(10, 100), textRed);
+            spriteBatch.DrawString(font, "Block Count : " + player.blockCount.ToString(), new Vector2(10, 115), textRed);
+            spriteBatch.DrawString(font, "Scroll : " + mouseScroll.ToString(), new Vector2(10, 145), textRed);
         }
         //public void countDrops()
         //{

@@ -260,37 +260,53 @@ namespace Graven
         }
 
 
-        public void updateLight(ref Tile[,,] tiles, Player player) {
+        public void updateLight(ref Tile[,,] tiles, Player player, bool initialLoad = false) {
             resetLights(ref tiles, player);
 
-            for (int x = (int)(player.position.X / size.X) - 500; x < (int)(player.position.X / size.X) + 500; x++)
+            if (initialLoad)
             {
-                for (int y = (int)(player.position.Y / size.Y) - 500; y < (int)(player.position.Y / size.Y) + 500; y++)
+                for (int y = 0; y < totalHeight; y++)
                 {
-                    if (x > totalWidth -1 || x < 0 || y + 1 > totalHeight - 1 || y < 0)
-                        continue;
-                    
-                   /// if (tiles[1,y,x -1].tileType == TileType.Empty && tiles[1,y -1 ,x -1].tileType == TileType.Empty &&tiles[1,y - 1,x +1].tileType == TileType.Empty && tiles[1,y,x +1].tileType == TileType.Empty
-                    //    && tiles[1,y+1,x +1].tileType == TileType.Empty & tiles[1,y + 1,x].tileType == TileType.Empty && tiles[1,y+1,x -1].tileType == TileType.Empty) 
-                  //  {
-                    if (tiles[1, y, x].tileType == TileType.Empty || tiles[1, y, x].tileType == TileType.Decoration || tiles[1, y, x].tileType == TileType.Tree)
+                    for (int x = 0; x < totalWidth; x++)
                     {
-                        tiles[1, y, x].lightValue = 1;
-                        tiles[1, y, x].lightRad = 5;
-                        lightRadius(ref tiles, x, y, player);
+                        if (x > totalWidth - 1 || x < 0 || y + 1 > totalHeight - 1 || y < 0)
+                            continue;
+
+                        if (tiles[1, y, x].tileType == TileType.Empty || tiles[1, y, x].tileType == TileType.Decoration || tiles[1, y, x].tileType == TileType.Tree)
+                        {
+                            tiles[1, y, x].lightValue = 1;
+                            tiles[1, y, x].lightRad = 5;
+                            lightRadius(ref tiles, x, y, player);
+                        }
                     }
-                   // }
                 }
-            }
+            } 
+            else
+                for (int x = (int)(player.position.X / size.X) - 50; x < (int)(player.position.X / size.X) + 50; x++)
+                {
+                    for (int y = (int)(player.position.Y / size.Y) - 50; y < (int)(player.position.Y / size.Y) + 50; y++)
+                    {
+
+                        if (x > totalWidth - 1 || x < 0 || y + 1 > totalHeight - 1 || y < 0)
+                            continue;
+
+                        if (tiles[1, y, x].tileType == TileType.Empty || tiles[1, y, x].tileType == TileType.Decoration || tiles[1, y, x].tileType == TileType.Tree)
+                        {
+                            tiles[1, y, x].lightValue = 1;
+                            tiles[1, y, x].lightRad = 5;
+                            lightRadius(ref tiles, x, y, player);
+                        }
+                    }
+                }
         }
 
         public void resetLights(ref Tile[,,] tiles, Player player) {
             for (int x = (int)(player.position.X / size.X) - 50; x < (int)(player.position.X / size.X) + 50; x++)
-                for (int y = (int)(player.position.Y / size.Y) - 45; y < (int)(player.position.Y / size.Y) + 45; y++)
+                for (int y = (int)(player.position.Y / size.Y) - 50; y < (int)(player.position.Y / size.Y) + 50; y++)
                 {
                     if (x > totalWidth - 1 || x < 0 || y > totalHeight - 1 || y < 0)
                         continue;
-                    //if (world[x, y].Type == TileType.Torch)
+                    //if (tiles[1, y, x].tileType == TileType.Torch)
                    //     continue;
                     tiles[1, y, x].lightValue = 0;
                 }
